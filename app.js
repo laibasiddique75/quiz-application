@@ -1,3 +1,4 @@
+
 const questions = [
     {
         
@@ -16,7 +17,7 @@ const questions = [
     answers: [
         {option: 'The "head" section',correct:false},
         {option: 'The "body" section',correct:false},
-        {option: 'Both the "head" and "body" section are correct',correct:false},
+        // {option: 'Both the "head" and "body" section are correct',correct:false},
         {option: 'The "body" section',correct:true}   //correct
     ]
     },
@@ -42,7 +43,7 @@ const questions = [
         question: 'How can you add a comment in a JavaScript?',
         answers: [
             {option: '//This is a comment',correct:false},
-           { option: 'This is a comment',correct:false},
+        //    { option: 'This is a comment',correct:false},
             {option: '*/--This is a comment/*',correct:false},
            { option: '//This is a comment',correct:true} // correct
         ]
@@ -61,7 +62,7 @@ const questions = [
         answers: [
         {option: 'function = myFunction()',correct:false},
         {option: 'function myFunction()',correct:false},
-      { option: 'function:myFunction()',correct:false},
+    //   { option: 'function:myFunction()',correct:false},
        {option: 'function myFunction()',correct:true} //correct
     ]
     },
@@ -76,108 +77,115 @@ const questions = [
     }
 ];
 
-const questionElement =document.getElementById("question");
+
+
+
+const questionElement = document.getElementById("question");
 const answerBtns = document.getElementById("answer-button");
 const nxtBtn = document.getElementById("nxt-btn");
+const prevBtn = document.getElementById("prev-btn"); // Add previous button
 
 let currentQuestionIndex = 0;
 let score = 0;
 
-function startQuiz(){
+function startQuiz() {
     currentQuestionIndex = 0;
     score = 0;
-    nxtBtn.innerHTML = "Next"
+    nxtBtn.innerHTML = "Next";
+    prevBtn.style.display = "none"; // Hide "Previous" button initially
     showQuestion();
 }
 
-function showQuestion(){
-
+function showQuestion() {
     resetState();
     let currentQuestion = questions[currentQuestionIndex];
     let questionNo = currentQuestionIndex + 1;
     questionElement.innerHTML = questionNo + " . " + currentQuestion.question;
 
-
     currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button")
+        const button = document.createElement("button");
         button.innerHTML = answer.option;
         button.classList.add("btn");
         answerBtns.appendChild(button);
-        if(answer.correct){
+        if (answer.correct) {
             button.dataset.correct = answer.correct;
         }
-        button.addEventListener("click",selectAnswer)
-        
+        button.addEventListener("click", selectAnswer);
     });
+
+    // Show the "Previous" button except for the first question
+    if (currentQuestionIndex > 0) {
+        prevBtn.style.display = "block";
+    } else {
+        prevBtn.style.display = "none";
+    }
 }
 
-
-
-
-function resetState(){
-
+function resetState() {
     nxtBtn.style.display = "none";
-    while(answerBtns.firstChild){
+    prevBtn.style.display = currentQuestionIndex > 0 ? "block" : "none"; // Show/hide "Previous" button
+    while (answerBtns.firstChild) {
         answerBtns.removeChild(answerBtns.firstChild);
     }
 }
 
-function selectAnswer(e){
+function selectAnswer(e) {
     const selectedBtn = e.target;
     const isCorrect = selectedBtn.dataset.correct === "true";
-    if(isCorrect){
-
-selectedBtn.classList.add("correct");
-score++;
-    }else{
-        selectedBtn.classList.add("inCorrect")
+    if (isCorrect) {
+        selectedBtn.classList.add("correct");
+        score++;
+    } else {
+        selectedBtn.classList.add("incorrect");
     }
 
     Array.from(answerBtns.children).forEach(button => {
-        if(button.dataset.correct === "true"){
-button.classList.add("correct");
+        if (button.dataset.correct === "true") {
+            button.classList.add("correct");
         }
         button.disabled = true;
     });
-    nxtBtn.style.display ="block";
+
+    nxtBtn.style.display = "block";
 }
 
-
-function showScore(){
+function showScore() {
     resetState();
     questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
     nxtBtn.innerHTML = "Play Again";
-    nxtBtn.style.display = "block"
+    nxtBtn.style.display = "block";
+    prevBtn.style.display = "none"; // Hide "Previous" button when showing score
 }
 
-
-function handleNextbutton(){
-    currentQuestionIndex ++;
-    if(currentQuestionIndex < questions.length){
-showQuestion();
-    }else{
+function handleNextButton() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+        showQuestion();
+    } else {
         showScore();
     }
 }
 
-nxtBtn.addEventListener("click",()=>{
-    if(currentQuestionIndex < questions.length){
-handleNextbutton();
-    }else{
+function handlePrevButton() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--; // Go to the previous question
+        showQuestion();
+    }
+}
+
+nxtBtn.addEventListener("click", () => {
+    if (currentQuestionIndex < questions.length) {
+        handleNextButton();
+    } else {
         startQuiz();
     }
-})
+});
+
+prevBtn.addEventListener("click", () => {
+    handlePrevButton();
+});
+
 startQuiz();
-
-
-
-
-
-
-
-
-
-
 
 
 
